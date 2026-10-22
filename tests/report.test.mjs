@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {TASKS, INITIAL_PROFILE, deriveReport, validateEvidence} from '../src/report.js';
+import {ensureTask} from '../src/observation.js';
+const sample=()=>TASKS.map(t=>ensureTask({...t}));
+test('language context takes priority and does not trigger a course match',()=>{const t=sample();t[3].comprehension='unclear';const r=deriveReport(t,INITIAL_PROFILE);assert.equal(r.plan.key,'language');assert.equal(r.plan.course,null);assert.equal(r.focusId,4)});
+test('explaining a choice is not treated as pattern learning',()=>{const t=sample();t[3].status='independent';const r=deriveReport(t,INITIAL_PROFILE);assert.equal(r.plan.key,'reasoning');assert.equal(r.focusId,8)});
+test('support needs outside specialized rules do not become an extension claim',()=>{const t=sample().map(x=>({...x,status:'independent'}));t[0].status='supported';const r=deriveReport(t,INITIAL_PROFILE);assert.equal(r.plan.key,'practice');assert.equal(r.focusId,1);assert.equal(r.plan.course,null)});
+test('unobserved tasks are not scored as low ability',()=>{const t=sample().map(x=>({...x,status:'unseen',note:''}));const r=deriveReport(t,INITIAL_PROFILE);assert.equal(r.observed,0);assert.equal(r.plan.key,'observe');assert.equal(r.plan.course,null);assert.deepEqual(validateEvidence(t),[])});
+test('observed task without evidence is blocked',()=>{const t=sample();t[3].note=' ';assert.deepEqual(validateEvidence(t),[4])});
+test('report is a snapshot; missing edited translations stay missing',()=>{const t=sample();t[3].note='Edited observation';t[3].noteEn='';const r=deriveReport(t,INITIAL_PROFILE);t[3].note='Later edit';assert.equal(r.evidence,'Edited observation');assert.equal(r.tasks[3].note,'Edited observation');assert.equal(r.evidenceEn,'')});
