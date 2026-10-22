@@ -7,7 +7,7 @@ export default function LearningRadar({tasks,en}){
  const xy=(i,r)=>[220+Math.sin(i*2*Math.PI/5)*r,172-Math.cos(i*2*Math.PI/5)*r];
  const poly=r=>rows.map((_,i)=>xy(i,r).join(',')).join(' ');
  return <section className="radar-section"><div className="section-heading"><div><p className="section-kicker">{t('学习能力画像','LEARNING PROFILE')}</p><h2>{t('五个维度，看见优势与下一步','Five dimensions. A clearer next step.')}</h2></div></div><p className="radar-intro">{t('结合本次 11 项任务，呈现孩子在不同学习维度上的表现。','An evidence-based view of learning across this session’s 11 tasks.')}</p><div className="radar-layout"><div><svg viewBox="0 0 440 345" role="img" aria-label={t('五维学习表现雷达图','Five-dimension learning profile radar chart')}>
- {[1,2,3].map(n=><polygon key={n} points={poly(n*38)} fill={n===3?'#f4f7f1':'none'} stroke="#d6dfd2"/>)}
+ {[3,2,1].map(n=><polygon key={n} points={poly(n*38)} fill={n===3?'#f4f7f1':'none'} stroke="#d6dfd2"/>)}
  {rows.map((r,i)=><line key={i} x1="220" y1="172" x2={xy(i,114)[0]} y2={xy(i,114)[1]} stroke="#d6dfd2"/>)}
  {rows.every(r=>r.score!==null)&&<polygon points={rows.map((r,i)=>xy(i,r.score*38).join(',')).join(' ')} fill="#4a806d33" stroke="#356c56" strokeWidth="2.5"/>}
  {rows.map((r,i)=>{const [x,y]=xy(i,150);return <g key={i}>{r.score!==null&&<circle cx={xy(i,r.score*38)[0]} cy={xy(i,r.score*38)[1]} r="4.5" fill="#356c56"/>}<text x={x} y={y} textAnchor="middle" fontSize="12" fontWeight="600" fill="#294638">{r.label}</text><text x={x} y={y+17} textAnchor="middle" fontSize="11" fill="#6b756c">{r.score===null?t('待观察','Not observed'):r.score.toFixed(1)+' / 3'}</text></g>})}
